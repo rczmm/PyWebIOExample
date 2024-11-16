@@ -4,10 +4,10 @@ from pywebio.output import put_markdown, put_button, toast, put_row, put_text, p
 from pywebio.pin import put_input, put_select, pin
 
 data = [
-    {"流水号": "GCSQ2024-08-15-0016", "申请日期": "2023/05/21", "用气人": "张三", "用气性质": "生活用气",
-     "经办人": "张三", "提交时间": "2023/05/21",
+    {"流水号": "GCSQ2024-08-15-0016", "申请日期": "2023-05-21", "用气人": "张三", "用气性质": "生活用气",
+     "经办人": "张三", "提交时间": "2023-05-21",
      "业务进程": {"提交申请": 1, "客户预约": 1, "上门通气": 1, "通气验收": 1}},
-    {"流水号": "GCSQ2024-08-15-0017", "申请日期": "2023/05/22", "用气人": "李四", "用气性质": "商业用气",
+    {"流水号": "GCSQ2024-08-15-0017", "申请日期": "2023-05-22", "用气人": "李四", "用气性质": "商业用气",
      "经办人": "李四", "提交时间": "2023/05/22",
      "业务进程": {"提交申请": 2, "客户预约": 1, "上门通气": 1, "通气验收": 1}},
 ]
@@ -40,10 +40,8 @@ def display_table(data_arg):
     with use_scope("table", clear=True):
         """显示数据表格"""
         headers = ['序号', "流水号", "申请日期", "用气人", "用气性质", "经办人", "提交时间", "业务进程", "操作"]
-
         # 构建表头
         header_row = put_row([put_text(header) for header in headers])
-
         # 构建数据行
         rows = [header_row]
         for i, item in enumerate(data_arg):
@@ -69,7 +67,6 @@ def display_table(data_arg):
                 buttons.append(put_button("验收", onclick=lambda index=i: show_acceptance_popup(index)))
             elif item["业务进程"]["通气验收"] < 2 and item["业务进程"]["通气验收"] == 0:
                 buttons.append(put_button("整改", onclick=lambda index=i: show_acceptance_popup(index)))
-
             row.append(put_row(buttons))
             rows.append(row)
         put_column([put_row(row) for row in rows])
@@ -94,13 +91,9 @@ def add_application_form():
     def submit_form():
         # 获取输入的表单值
         fields = pin
-
-        print(fields)
-
         if not fields['id']:
             toast("请完整填写表单信息", color='error')
             return
-
         application = {
             "流水号": fields["id"],
             "申请日期": fields["report_date"],
@@ -121,7 +114,7 @@ def add_application_form():
         put_input(label="请输入用气人", name="use_person", type="text"),
         put_select(label="请选择用气性质", name="nature", options=["生活用气", "商业用气", "单位用气"]),
         put_input(label="请输入经办人", name="do_person", type="text"),
-        put_input(label="请选择提交时间", name="summit_date", type="time"),
+        put_input(label="请选择提交时间", name="summit_date", type="datetime-local"),
         put_button("提交", onclick=submit_form)
     ]))
 
