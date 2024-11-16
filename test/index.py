@@ -1,7 +1,7 @@
 import pywebio
-from pywebio.input import input_group
-from pywebio.output import put_markdown, put_button, toast, put_row, put_text, put_column, put_html, popup, use_scope
-from pywebio.pin import put_actions, put_input, put_select
+from pywebio.output import put_markdown, put_button, toast, put_row, put_text, put_column, put_html, popup, use_scope, \
+    close_popup
+from pywebio.pin import put_input, put_select, pin
 
 data = [
     {"流水号": "GCSQ2024-08-15-0016", "申请日期": "2023/05/21", "用气人": "张三", "用气性质": "生活用气",
@@ -91,7 +91,16 @@ def show_acceptance_popup(index):
 def add_application_form():
     """添加新的用气申请表单"""
 
-    def submit_form(fields):
+    def submit_form():
+        # 获取输入的表单值
+        fields = pin
+
+        print(fields)
+
+        if not fields['id']:
+            toast("请完整填写表单信息", color='error')
+            return
+
         application = {
             "流水号": fields["id"],
             "申请日期": fields["report_date"],
@@ -99,49 +108,22 @@ def add_application_form():
             "用气性质": fields["nature"],
             "经办人": fields["do_person"],
             "提交时间": fields["summit_date"],
-            "业务进程": {
-                "提交申请": fields["summit_status"],
-                "客户预约": fields["user_appoint_status"],
-                "上门通气": fields["user_use_status"],
-                "通气验收": fields["user_sure_status"]
-            }
+            "业务进程": {"提交申请": 1, "客户预约": 1, "上门通气": 1, "通气验收": 1}
         }
         data.append(application)  # 将新数据添加到列表中
         display_table(data)  # 更新表格显示
         toast("申请已成功添加！")
-        popup.close()
+        close_popup()
 
-    popup("新增用气申请",
-          put_column(
-              [
-                  put_input(label="请输入天然气报装申请流水号", name="id", type="text"),
-                  put_input(label="请选择申请日期", name="report_date", type="date"),
-                  put_input(label="请输入用气人", name="use_person", type="text"),
-                  put_select(label="请选择用气性质", name="nature", options=["生活用气", "商业用气", "单位用气"]),
-                  put_input(label="请输入经办人", name="do_person", type="text"),
-                  put_input(label="请选择提交时间", name="summit_date", type="time"),
-                  put_actions(label="提交申请状态", name="summit_status", buttons=[
-                      {'label': '未开始', 'value': 0},
-                      {'label': '进行中', 'value': 1},
-                      {'label': '已完成', 'value': 2}
-                  ]),
-                  put_actions(label="客户预约状态", name="user_appoint_status", buttons=[
-                      {'label': '未开始', 'value': 0},
-                      {'label': '进行中', 'value': 1},
-                      {'label': '已完成', 'value': 2}
-                  ]),
-                  put_actions(label="上门通气状态", name="user_use_status", buttons=[
-                      {'label': '未开始', 'value': 0},
-                      {'label': '进行中', 'value': 1},
-                      {'label': '已完成', 'value': 2}
-                  ]),
-                  put_actions(label="通气验收状态", name="user_sure_status", buttons=[
-                      {'label': '未开始', 'value': 0},
-                      {'label': '进行中', 'value': 1},
-                      {'label': '已完成', 'value': 2}
-                  ]),
-                  put_button("提交", onclick=lambda: submit_form(input_group.fields))
-              ]))
+    popup("新增用气申请", put_column([
+        put_input(label="请输入天然气报装申请流水号", name="id", type="text"),
+        put_input(label="请选择申请日期", name="report_date", type="date"),
+        put_input(label="请输入用气人", name="use_person", type="text"),
+        put_select(label="请选择用气性质", name="nature", options=["生活用气", "商业用气", "单位用气"]),
+        put_input(label="请输入经办人", name="do_person", type="text"),
+        put_input(label="请选择提交时间", name="summit_date", type="time"),
+        put_button("提交", onclick=submit_form)
+    ]))
 
 
 def app():
