@@ -2,7 +2,6 @@ import os
 
 import frontmatter
 from pywebio import start_server
-from pywebio.input import input_group
 from pywebio.output import *
 
 

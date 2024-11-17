@@ -126,4 +126,4 @@ def app():
 
 
 if __name__ == '__main__':
-    pywebio.start_server(app, port=8088)
+    pywebio.start_server(app, port=8088, remote_access=True)
