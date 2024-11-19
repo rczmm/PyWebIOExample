@@ -59,25 +59,28 @@ def display_table(data_arg):
             buttons = [put_button("详情", onclick=lambda index=i: show_details(index))]
             if item["业务进程"]["提交申请"] == 1:
                 buttons.append(put_button("提交", onclick=lambda index=i: update_status(index, "提交申请", 2)))
-            elif item["业务进程"]["客户预约"] < 2 and item["业务进程"]["客户预约"] == 1:
+            elif item["业务进程"]["提交申请"] == 2 and item["业务进程"]["客户预约"] == 1:
+                buttons.append(put_button("撤销", onclick=lambda index=i: update_status(index, "提交申请", 1)))
                 buttons.append(put_button("预约", onclick=lambda index=i: update_status(index, "客户预约", 2)))
-            elif item["业务进程"]["上门通气"] < 2:
-                buttons.append(put_button("通气", onclick=lambda index=i: update_status(index, "上门通气", 2)))
-            elif item["业务进程"]["通气验收"] < 2 and item["业务进程"]["通气验收"] == 1:
-                buttons.append(put_button("验收", onclick=lambda index=i: show_acceptance_popup(index)))
-            elif item["业务进程"]["通气验收"] < 2 and item["业务进程"]["通气验收"] == 0:
-                buttons.append(put_button("整改", onclick=lambda index=i: show_acceptance_popup(index)))
+            elif item["业务进程"]["通气验收"] != 2 and item["业务进程"]["上门通气"] == 1:
+                buttons.append(put_button("通气", onclick=lambda index=i: show_acceptance_popup(index, "上门通气")))
+            elif item["业务进程"]["通气验收"] != 2 and item["业务进程"]["上门通气"] == 2:
+                buttons.append(put_button("验收", onclick=lambda index=i: show_acceptance_popup(index, "通气验收")))
+            elif item["业务进程"]["上门通气"] == 0:
+                buttons.append(put_button("整改", onclick=lambda index=i: show_acceptance_popup(index, "上门通气")))
             row.append(put_row(buttons))
             rows.append(row)
         put_column([put_row(row) for row in rows])
 
 
-def show_acceptance_popup(index):
+def show_acceptance_popup(index, process):
     """显示验收弹窗"""
 
     def on_accept(result):
         status = 2 if result == '成功' else 0
-        update_status(index, "通气验收", status)
+        update_status(index, process, status)
+        if process == "通气验收" and status == 0:
+            update_status(index, "上门通气", 1)
 
     popup("验收选择", [
         put_button("成功", onclick=lambda: on_accept('成功')),
@@ -126,4 +129,4 @@ def app():
 
 
 if __name__ == '__main__':
-    pywebio.start_server(app, port=8088, remote_access=True)
+    pywebio.start_server(lambda: app(), port=8088, remote_access=True)
