@@ -65,7 +65,8 @@ def podcast_page(podcast_list_arg):
         - **描述**: {podcast['description']}
         ---
         """)
-        put_button(label='查看全文', onclick=lambda: show_details(podcast['body']),
+        print(podcast['body'])
+        put_button(label='查看全文', onclick=lambda body=podcast['body']: show_details(body),
                    color='info', outline=True)
 
 
